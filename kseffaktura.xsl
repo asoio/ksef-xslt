@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tns="http://crd.gov.pl/wzor/2023/06/29/12648/" version="1.0">
-  <xsl:output method="html" encoding="UTF-8" indent="yes" version="4.01" doctype-public="-//W3C//DTD HTML 4.01//EN" doctype-system="http://www.w3.org/TR/html4/strict.dtd"/>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tns="http://crd.gov.pl/wzor/2023/06/29/12648/" version="1.0" exclude-result-prefixes="tns">
+  <xsl:output method="html" encoding="utf-8" indent="yes"/>
   <xsl:decimal-format name="european" decimal-separator=',' grouping-separator=' ' NaN=""/>
 
   <xsl:template match="tns:Faktura">
+  <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html&gt;</xsl:text>
   <html lang="pl">
     <head>
-      <title>e-FAKTURA KSeF</title>
+      <title>e-FAKTURA KSeF</title>            
       <meta charset="utf-8"/>
       <link href="https://fonts.googleapis.com/css?family=Open&#x2B;Sans" rel="stylesheet"/>
       <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"/>
@@ -83,12 +84,6 @@
               </xsl:choose>
             </span>
           </span>
-          <xsl:comment>
-            <span class="label-data-info">
-              <span class="label-data-info--name">Numer KSeF: </span>
-              <span class="label-data-info--value">7777777777-20231007-39A5899B977D-AE</span>
-            </span>
-          </xsl:comment>
         </div>
       </div>
     </div>
@@ -100,7 +95,7 @@
       <xsl:variable name="IleDaneIdentKor"><xsl:value-of select="count(tns:Fa/tns:DaneFaKorygowanej)"/></xsl:variable>
       <xsl:if test="tns:Fa/tns:NrFaKorygowany | tns:Fa/tns:PrzyczynaKorekty | tns:Fa/tns:TypKorekty | tns:Fa/tns:P_15ZK | tns:Fa/tns:KursWalutyZK or $IleDaneIdentKor = 1">
         <div class="section-data">
-          <div class="line-basic"></div>
+          <div class="line-basic"><xsl:text> </xsl:text></div>
           <xsl:if test="tns:Fa/tns:NrFaKorygowany | tns:Fa/tns:PrzyczynaKorekty | tns:Fa/tns:TypKorekty | tns:Fa/tns:P_15ZK | tns:Fa/tns:KursWalutyZK">
             <div class="section-data__wrapper-left">
               <span class="section-data__header section-data__header--h1">Dane faktury korygowanej</span>
@@ -170,7 +165,7 @@
 
       <xsl:if test="$IleDaneIdentKor > 1">
         <div class="section-data">
-          <div class="line-basic"></div>
+          <div class="line-basic"><xsl:text> </xsl:text></div>
           <div class="section-data__wrapper-left">
             <xsl:for-each select="tns:Fa/tns:DaneFaKorygowanej">
               <xsl:if test="(position() mod 2) != 0">
@@ -199,7 +194,7 @@
   <xsl:template name="SprzedawcaNabywca">
     <xsl:if test="not(tns:Fa/tns:Podmiot1K) and not(tns:Fa/tns:Podmiot2K[tns:IDNabywcy = //tns:Podmiot2/tns:IDNabywcy])"> <!-- jeśli nie ma Sprzedawcy korygowanego ani nie ma Nabywcy korygowanego -->
       <div class="section-data">
-        <div class="line-basic"></div>
+        <div class="line-basic"><xsl:text> </xsl:text></div>
         <div class="section-data__wrapper-left">
         <!-- Sprzedawca -->
           <span class="section-data__header section-data__header--h1">Sprzedawca</span>
@@ -214,7 +209,7 @@
     </xsl:if>
     <xsl:if test="tns:Fa/tns:Podmiot1K"> <!-- jeśli jest Sprzedawca korygowany -->
       <div class="section-data">
-        <div class="line-basic"></div>
+        <div class="line-basic"><xsl:text> </xsl:text></div>
         <span class="section-data__header section-data__header--h1">Sprzedawca</span>
         <div class="section-data">
           <div class="section-data__wrapper-left">
@@ -235,7 +230,7 @@
       </div>
       <xsl:if test="not(tns:Fa/tns:Podmiot2K[tns:IDNabywcy = //tns:Podmiot2/tns:IDNabywcy])">
         <div class="section-data">
-          <div class="line-basic"></div>
+          <div class="line-basic"><xsl:text> </xsl:text></div>
           <div class="section-data__wrapper-left">
           <!-- Nabywca -->
             <span class="section-data__header section-data__header--h1">Nabywca</span>
@@ -249,7 +244,7 @@
     <xsl:if test="tns:Fa/tns:Podmiot2K[tns:IDNabywcy = //tns:Podmiot2/tns:IDNabywcy]"> <!-- jeśli jest Nabywca korygowany -->
       <xsl:if test="not(tns:Fa/tns:Podmiot1K)">
         <div class="section-data">
-          <div class="line-basic"></div>
+          <div class="line-basic"><xsl:text> </xsl:text></div>
           <div class="section-data__wrapper-left">
           <!-- Sprzedawca -->
             <span class="section-data__header section-data__header--h1">Sprzedawca</span>
@@ -260,7 +255,7 @@
         </div>
       </xsl:if>
       <div class="section-data">
-        <div class="line-basic"></div>
+        <div class="line-basic"><xsl:text> </xsl:text></div>
         <span class="section-data__header section-data__header--h1">Nabywca</span>
         <div class="section-data">
           <div class="section-data__wrapper-left">
@@ -476,7 +471,7 @@
         </xsl:choose>
       </xsl:variable>
       <div class="section-data">
-        <div class="line-basic"></div>
+        <div class="line-basic"><xsl:text> </xsl:text></div>
         <xsl:choose>
           <xsl:when test="tns:IDNabywcy = //tns:Podmiot2K/tns:IDNabywcy">
               <span class="section-data__header section-data__header--h1">
@@ -553,10 +548,10 @@
                 <span class="label-data-info--name">
                   <xsl:choose>
                     <xsl:when test="tns:RolaInna = '1'">
-                      <xsl:text>Rola inna:</xsl:text>
+                      <xsl:text>Rola inna: </xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:text>Rola:</xsl:text>
+                      <xsl:text>Rola: </xsl:text>
                     </xsl:otherwise>
                   </xsl:choose>
                 </span>
@@ -678,10 +673,10 @@
         <span class="label-data-info--name">
           <xsl:choose>
             <xsl:when test="tns:RolaInna = '1'">
-              <xsl:text>Rola inna:</xsl:text>
+              <xsl:text>Rola inna: </xsl:text>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:text>Rola:</xsl:text>
+              <xsl:text>Rola: </xsl:text>
             </xsl:otherwise>
           </xsl:choose>
         </span>
@@ -797,7 +792,7 @@
   <xsl:template name="PodmiotUpowazniony">
     <xsl:for-each select="tns:PodmiotUpowazniony">
       <div class="section-data">
-        <div class="line-basic"></div>
+        <div class="line-basic"><xsl:text> </xsl:text></div>
         <div class="section-data__wrapper-left">
           <span class="section-data__header section-data__header--h1">Podmiot upoważniony</span>
           <span class="label-data-info">
@@ -871,7 +866,7 @@
   <!-- SZCZEGÓŁY -->
   <xsl:template name="Szczegoly">
     <div class="section-data">
-      <div class="line-basic"></div>
+      <div class="line-basic"><xsl:text> </xsl:text></div>
       <span class="section-data__header section-data__header--h1">Szczegóły</span>
       <span class="label-data-info label-data-info--half">
         <span class="label-data-info--name">Data wystawienia, z zastrzeżeniem art. 106na ust. 1 ustawy: </span>
@@ -1003,7 +998,7 @@
   <xsl:template name="Pozycje">
     <xsl:if test="tns:Fa/tns:FaWiersz | tns:Fa/tns:OkresFaKorygowanej">
       <div class="section-data">
-        <div class="line-basic"></div>
+        <div class="line-basic"><xsl:text> </xsl:text></div>
         <span class="section-data__header section-data__header--h1">
           <xsl:choose>
             <xsl:when test="tns:Fa/tns:OkresFaKorygowanej">
@@ -1348,7 +1343,7 @@
   <xsl:template name="Zamowienie">
     <xsl:if test="tns:Fa/tns:Zamowienie">
       <div class="section-data">
-        <div class="line-basic"></div>
+        <div class="line-basic"><xsl:text> </xsl:text></div>
         <span class="section-data__header section-data__header--h1">Zamówienie</span>
         <xsl:if test="tns:Fa/tns:Zamowienie/tns:ZamowienieWiersz">
           <xsl:variable name="P_12Z_Zal_15"><xsl:choose><xsl:when test="tns:Fa/tns:Zamowienie/tns:ZamowienieWiersz/tns:P_12Z_Zal_15"><xsl:value-of select="'1'"/></xsl:when><xsl:otherwise><xsl:value-of select="'0'"/></xsl:otherwise></xsl:choose></xsl:variable>
@@ -1623,7 +1618,7 @@
   <xsl:template name="PodsumowanieStawek">
     <xsl:if test="tns:Fa/*[starts-with(local-name(),'P_13_')]">
       <div class="section-data">
-        <div class="line-basic"></div>
+        <div class="line-basic"><xsl:text> </xsl:text></div>
         <span class="section-data__header section-data__header--h1">Podsumowanie stawek podatku</span>
         <table class="table-basic">
           <thead>
@@ -1832,7 +1827,7 @@
     <xsl:for-each select="tns:Fa/tns:Adnotacje">
       <xsl:if test="tns:P_18A = '1' or tns:P_16 = '1' or tns:P_17 = '1' or tns:P_18 = '1' or tns:Zwolnienie/tns:P_19 = '1' or tns:NoweSrodkiTransportu/tns:P_22 = '1' or tns:P_23 = '1' or tns:PMarzy/tns:P_PMarzy = '1'">
         <div class="section-data">
-          <div class="line-basic"></div>
+          <div class="line-basic"><xsl:text> </xsl:text></div>
           <span class="section-data__header section-data__header--h1">Adnotacje</span>
           <div class="section-data__divide-lr">
             <xsl:if test="tns:Zwolnienie/tns:P_19 = '1'">
@@ -2004,7 +1999,7 @@
   <xsl:template name="Rozliczenie">
     <xsl:if test="tns:Fa/tns:Rozliczenie">
       <div class="section-data">
-        <div class="line-basic"></div>
+        <div class="line-basic"><xsl:text> </xsl:text></div>
         <span class="section-data__header section-data__header--h1">Rozliczenie</span>
         <xsl:if test="tns:Fa/tns:Rozliczenie/tns:Obciazenia">
           <div class="section-data__wrapper-left">
@@ -2028,7 +2023,7 @@
               </table>
               <xsl:if test="tns:Fa/tns:Rozliczenie/tns:SumaObciazen">
                 <span class="label-data-info label-data-info--right">
-                  <span class="label-data-info--name">Suma kwot obciążenia:</span>
+                  <span class="label-data-info--name">Suma kwot obciążenia: </span>
                   <span class="label-data-info--value"><xsl:value-of select="format-number(tns:Fa/tns:Rozliczenie/tns:SumaObciazen, '### ##0,00######', 'european')"/></span>
                 </span>
               </xsl:if>
@@ -2102,7 +2097,7 @@
   <xsl:template name="Platnosc">
     <xsl:if test="tns:Fa/tns:Platnosc">
       <div class="section-data">
-        <div class="line-basic"></div>
+        <div class="line-basic"><xsl:text> </xsl:text></div>
         <span class="section-data__header section-data__header--h1">Płatność</span>
         <xsl:if test="tns:Fa/tns:Platnosc/tns:Zaplacono = '1' or tns:Fa/tns:Platnosc/tns:ZnacznikZaplatyCzesciowej = '1'">
           <span class="label-data-info">
@@ -2231,7 +2226,7 @@
       </div>
       <xsl:if test="tns:Fa/tns:Platnosc/tns:RachunekBankowy | tns:Fa/tns:Platnosc/tns:RachunekBankowyFaktora">
         <div class="section-data">
-          <div class="line-basic"></div>
+          <div class="line-basic"><xsl:text> </xsl:text></div>
           <xsl:variable name="IleRach"><xsl:value-of select="count(tns:Fa/tns:Platnosc/tns:RachunekBankowy)"/></xsl:variable>
           <xsl:variable name="IleRachFakt"><xsl:value-of select="count(tns:Fa/tns:Platnosc/tns:RachunekBankowyFaktora)"/></xsl:variable>
           <div class="section-data__wrapper-left">
@@ -2276,7 +2271,7 @@
   <xsl:template name="WarunkiTransakcji">
     <xsl:if test="tns:Fa/tns:WarunkiTransakcji">
       <div class="section-data">
-        <div class="line-basic"></div>
+        <div class="line-basic"><xsl:text> </xsl:text></div>
         <span class="section-data__header section-data__header--h1">Warunki transakcji</span>
         <xsl:if test="tns:Fa/tns:WarunkiTransakcji/tns:Umowy">
           <div class="section-data__wrapper-left">
@@ -2418,7 +2413,7 @@
       <xsl:if test="tns:Fa/tns:WarunkiTransakcji/tns:Transport">
         <xsl:variable name="IleTransp"><xsl:value-of select="count(tns:Fa/tns:WarunkiTransakcji/tns:Transport)"/></xsl:variable>
         <xsl:for-each select="tns:Fa/tns:WarunkiTransakcji/tns:Transport">
-          <div class="line-basic"></div>
+          <div class="line-basic"><xsl:text> </xsl:text></div>
           <div class="section-data">
             <xsl:variable name="NrKolejnyTransp">
               <xsl:choose>
@@ -2645,7 +2640,7 @@
   <!-- WZ -->
   <xsl:template name="WZ">
     <xsl:if test="tns:Fa/tns:WZ">
-      <div class="line-basic"></div>
+      <div class="line-basic"><xsl:text> </xsl:text></div>
       <div class="section-data">
         <span class="section-data__header section-data__header--table">Numery dokumentów magazynowych WZ</span>
         <table class="table-basic table-basic--auto">
@@ -2669,7 +2664,7 @@
   <!-- STOPKA -->
   <xsl:template name="Stopka">
     <xsl:if test="tns:Stopka/tns:Rejestry">
-      <div class="line-basic"></div>
+      <div class="line-basic"><xsl:text> </xsl:text></div>
       <div class="section-data">
         <span class="section-data__header section-data__header--h1">Rejestry</span>
         <table class="table-basic table-basic--auto">
@@ -2711,7 +2706,7 @@
       </div>
     </xsl:if>
     <xsl:if test="tns:Stopka/tns:Informacje/tns:StopkaFaktury">
-      <div class="line-basic"></div>
+      <div class="line-basic"><xsl:text> </xsl:text></div>
       <div class="section-data">
         <span class="section-data__header section-data__header--h1">Pozostałe informacje</span>
         <table class="table-basic">
@@ -2735,7 +2730,7 @@
   <!-- SYSTEM INFO -->
   <xsl:template name="SystemInfo">
     <xsl:if test="tns:Naglowek/tns:SystemInfo">
-      <div class="line-basic"></div>
+      <div class="line-basic"><xsl:text> </xsl:text></div>
       <div class="section-data">
         <span class="label-data-info">
           <span class="label-data-info--name">Wytworzona w: </span>
