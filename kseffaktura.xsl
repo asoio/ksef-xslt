@@ -192,7 +192,7 @@
 
   <!-- SPRZEDAWCA + NABYWCA -->
   <xsl:template name="SprzedawcaNabywca">
-    <xsl:if test="not(tns:Fa/tns:Podmiot1K) and not(tns:Fa/tns:Podmiot2K[tns:IDNabywcy = //tns:Podmiot2/tns:IDNabywcy])"> <!-- jeśli nie ma Sprzedawcy korygowanego ani nie ma Nabywcy korygowanego -->
+    <xsl:if test="not(tns:Fa/tns:Podmiot1K) and not(tns:Fa/tns:Podmiot2K[tns:IDNabywcy = //tns:Podmiot2/tns:IDNabywcy]) and not(tns:Fa/tns:Podmiot2K[not(tns:IDNabywcy) and not(//tns:Podmiot2/tns:IDNabywcy)])"> <!-- jeśli nie ma Sprzedawcy korygowanego ani nie ma Nabywcy korygowanego -->
       <div class="section-data">
         <div class="line-basic"><xsl:text> </xsl:text></div>
         <div class="section-data__wrapper-left">
@@ -228,7 +228,7 @@
           </div>
         </div>
       </div>
-      <xsl:if test="not(tns:Fa/tns:Podmiot2K[tns:IDNabywcy = //tns:Podmiot2/tns:IDNabywcy])">
+      <xsl:if test="not(tns:Fa/tns:Podmiot2K[(tns:IDNabywcy = //tns:Podmiot2/tns:IDNabywcy) or (not(tns:IDNabywcy) and not(//tns:Podmiot2/tns:IDNabywcy))])">
         <div class="section-data">
           <div class="line-basic"><xsl:text> </xsl:text></div>
           <div class="section-data__wrapper-left">
@@ -241,7 +241,7 @@
         </div>
       </xsl:if>
     </xsl:if>
-    <xsl:if test="tns:Fa/tns:Podmiot2K[tns:IDNabywcy = //tns:Podmiot2/tns:IDNabywcy]"> <!-- jeśli jest Nabywca korygowany -->
+    <xsl:if test="tns:Fa/tns:Podmiot2K[(tns:IDNabywcy = //tns:Podmiot2/tns:IDNabywcy) or (not(tns:IDNabywcy) and not(//tns:Podmiot2/tns:IDNabywcy))]"> <!-- jeśli jest Nabywca korygowany -->
       <xsl:if test="not(tns:Fa/tns:Podmiot1K)">
         <div class="section-data">
           <div class="line-basic"><xsl:text> </xsl:text></div>
@@ -419,7 +419,7 @@
   </xsl:template>
 
   <xsl:template name="NabywcaKorygowany">
-    <xsl:for-each select="tns:Fa/tns:Podmiot2K[tns:IDNabywcy = //tns:Podmiot2/tns:IDNabywcy]">
+    <xsl:for-each select="tns:Fa/tns:Podmiot2K[(tns:IDNabywcy = //tns:Podmiot2/tns:IDNabywcy) or (not(tns:IDNabywcy) and not(//tns:Podmiot2/tns:IDNabywcy))][1]">
       <xsl:if test="tns:IDNabywcy">
         <span class="label-data-info">
           <span class="label-data-info--name">Identyfikator nabywcy: </span>
@@ -464,6 +464,10 @@
   <xsl:template name="PodmiotInny">
     <xsl:variable name="IlePodmiot3"><xsl:value-of select="count(tns:Podmiot3)"/></xsl:variable>
     <xsl:for-each select="tns:Podmiot3">
+      <xsl:variable name="PozycjaPodmiotu"><xsl:value-of select="position()"/></xsl:variable>
+      <xsl:variable name="IDNabywcy"><xsl:value-of select="tns:IDNabywcy"/></xsl:variable>
+      <xsl:variable name="PodmiotKorygowany" select="//tns:Podmiot2K[tns:IDNabywcy = $IDNabywcy] | (//tns:Podmiot2K[not(tns:IDNabywcy)][($PozycjaPodmiotu+1)])"/>
+
       <xsl:variable name="NrKolejnyInny">
         <xsl:choose>
           <xsl:when test="$IlePodmiot3 > 1"><xsl:value-of select="concat(' ', position())"/></xsl:when>
@@ -473,7 +477,7 @@
       <div class="section-data">
         <div class="line-basic"><xsl:text> </xsl:text></div>
         <xsl:choose>
-          <xsl:when test="tns:IDNabywcy = //tns:Podmiot2K/tns:IDNabywcy">
+          <xsl:when test="$PodmiotKorygowany">
               <span class="section-data__header section-data__header--h1">
                 <xsl:value-of select="concat('Podmiot inny', $NrKolejnyInny)"/>
               </span>
@@ -484,7 +488,7 @@
                     <span class="label-data-info--header">Treść korygowana</span>
                   </span>
                   <xsl:call-template name="NabywcaDodatkowyKorygowany">
-                    <xsl:with-param name="IDNabywcy" select="tns:IDNabywcy"/>
+                    <xsl:with-param name="PodmiotKorygowany" select="$PodmiotKorygowany"/>
                   </xsl:call-template>
                 </div>
                 <div class="section-data__wrapper-right">
@@ -493,7 +497,6 @@
                     <span class="label-data-info--header">Treść korygująca</span>
                   </span>
                   <xsl:call-template name="NabywcaDodatkowy">
-                    <xsl:with-param name="IDNabywcy" select="tns:IDNabywcy"/>
                   </xsl:call-template>
                 </div>
               </div>
@@ -626,128 +629,125 @@
   </xsl:template>
 
   <xsl:template name="NabywcaDodatkowy">
-    <xsl:param name="IDNabywcy"/>
-    <xsl:for-each select="//tns:Podmiot3[tns:IDNabywcy = $IDNabywcy]">
-      <xsl:if test="tns:IDNabywcy">
-        <span class="label-data-info">
-          <span class="label-data-info--name">Identyfikator nabywcy: </span>
-          <span class="label-data-info--value"><xsl:value-of select="tns:IDNabywcy"/></span>
-        </span>
-      </xsl:if>
-      <xsl:if test="tns:NrEORI">
-        <span class="label-data-info">
-          <span class="label-data-info--name">Numer EORI: </span>
-          <span class="label-data-info--value"><xsl:value-of select="tns:NrEORI"/></span>
-        </span>
-      </xsl:if>
+    <xsl:if test="tns:IDNabywcy">
       <span class="label-data-info">
+        <span class="label-data-info--name">Identyfikator nabywcy: </span>
+        <span class="label-data-info--value"><xsl:value-of select="tns:IDNabywcy"/></span>
+      </span>
+    </xsl:if>
+    <xsl:if test="tns:NrEORI">
+      <span class="label-data-info">
+        <span class="label-data-info--name">Numer EORI: </span>
+        <span class="label-data-info--value"><xsl:value-of select="tns:NrEORI"/></span>
+      </span>
+    </xsl:if>
+    <span class="label-data-info">
+      <xsl:choose>
+        <xsl:when test="tns:DaneIdentyfikacyjne/tns:NIP">
+          <span class="label-data-info--name">NIP: </span>
+          <span class="label-data-info--value"><xsl:value-of select="tns:DaneIdentyfikacyjne/tns:NIP"/></span>
+        </xsl:when>
+        <xsl:when test="tns:DaneIdentyfikacyjne/tns:IDWew">
+          <span class="label-data-info--name">Identyfikator wewnętrzny z NIP: </span>
+          <span class="label-data-info--value"><xsl:value-of select="tns:DaneIdentyfikacyjne/tns:IDWew"/></span>
+        </xsl:when>
+        <xsl:when test="tns:DaneIdentyfikacyjne/tns:KodUE">
+          <span class="label-data-info--name">Numer VAT-UE: </span>
+          <span class="label-data-info--value"><xsl:value-of select="tns:DaneIdentyfikacyjne/tns:KodUE"/>&#160;<xsl:value-of select="tns:DaneIdentyfikacyjne/tns:NrVatUE"/></span>
+        </xsl:when>
+        <xsl:when test="tns:DaneIdentyfikacyjne/tns:NrID">
+          <span class="label-data-info--name">Identyfikator podatkowy inny: </span>
+          <span class="label-data-info--value"><xsl:value-of select="tns:DaneIdentyfikacyjne/tns:KodKraju"/>&#160;<xsl:value-of select="tns:DaneIdentyfikacyjne/tns:NrID"/></span>
+        </xsl:when>
+        <xsl:when test="tns:DaneIdentyfikacyjne/tns:BrakID = '1'">
+          <span class="label-data-info--name">Brak identyfikatora</span>
+        </xsl:when>
+      </xsl:choose>
+    </span>
+    <xsl:if test="tns:DaneIdentyfikacyjne/tns:Nazwa">
+      <span class="label-data-info">
+        <span class="label-data-info--name">Nazwa: </span>
+        <span class="label-data-info--value"><xsl:value-of select="tns:DaneIdentyfikacyjne/tns:Nazwa"/></span>
+      </span>
+    </xsl:if>
+    <span class="label-data-info">
+      <span class="label-data-info--name">
         <xsl:choose>
-          <xsl:when test="tns:DaneIdentyfikacyjne/tns:NIP">
-            <span class="label-data-info--name">NIP: </span>
-            <span class="label-data-info--value"><xsl:value-of select="tns:DaneIdentyfikacyjne/tns:NIP"/></span>
+          <xsl:when test="tns:RolaInna = '1'">
+            <xsl:text>Rola inna: </xsl:text>
           </xsl:when>
-          <xsl:when test="tns:DaneIdentyfikacyjne/tns:IDWew">
-            <span class="label-data-info--name">Identyfikator wewnętrzny z NIP: </span>
-            <span class="label-data-info--value"><xsl:value-of select="tns:DaneIdentyfikacyjne/tns:IDWew"/></span>
+          <xsl:otherwise>
+            <xsl:text>Rola: </xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </span>
+      <span class="label-data-info--value">
+        <xsl:choose>
+          <xsl:when test="tns:Rola = '1'">
+            <xsl:text>Faktor</xsl:text>
           </xsl:when>
-          <xsl:when test="tns:DaneIdentyfikacyjne/tns:KodUE">
-            <span class="label-data-info--name">Numer VAT-UE: </span>
-            <span class="label-data-info--value"><xsl:value-of select="tns:DaneIdentyfikacyjne/tns:KodUE"/>&#160;<xsl:value-of select="tns:DaneIdentyfikacyjne/tns:NrVatUE"/></span>
+          <xsl:when test="tns:Rola = '2'">
+            <xsl:text>Odbiorca</xsl:text>
           </xsl:when>
-          <xsl:when test="tns:DaneIdentyfikacyjne/tns:NrID">
-            <span class="label-data-info--name">Identyfikator podatkowy inny: </span>
-            <span class="label-data-info--value"><xsl:value-of select="tns:DaneIdentyfikacyjne/tns:KodKraju"/>&#160;<xsl:value-of select="tns:DaneIdentyfikacyjne/tns:NrID"/></span>
+          <xsl:when test="tns:Rola = '3'">
+            <xsl:text>Podmiot pierwotny</xsl:text>
           </xsl:when>
-          <xsl:when test="tns:DaneIdentyfikacyjne/tns:BrakID = '1'">
-            <span class="label-data-info--name">Brak identyfikatora</span>
+          <xsl:when test="tns:Rola = '4'">
+            <xsl:text>Dodatkowy nabywca</xsl:text>
+          </xsl:when>
+          <xsl:when test="tns:Rola = '5'">
+            <xsl:text>Wystawca faktury</xsl:text>
+          </xsl:when>
+          <xsl:when test="tns:Rola = '6'">
+            <xsl:text>Dokonujący płatności</xsl:text>
+          </xsl:when>
+          <xsl:when test="tns:Rola = '7'">
+            <xsl:text>Jednostka samorządu terytorialnego - wystawca</xsl:text>
+          </xsl:when>
+          <xsl:when test="tns:Rola = '8'">
+            <xsl:text>Jednostka samorządu terytorialnego - odbiorca</xsl:text>
+          </xsl:when>
+          <xsl:when test="tns:Rola = '9'">
+            <xsl:text>Członek grupy VAT - wystawca</xsl:text>
+          </xsl:when>
+          <xsl:when test="tns:Rola = '10'">
+            <xsl:text>Członek grupy VAT - odbiorca</xsl:text>
+          </xsl:when>
+          <xsl:when test="tns:RolaInna = '1'">
+            <xsl:value-of select="tns:OpisRoli"/>
           </xsl:when>
         </xsl:choose>
       </span>
-      <xsl:if test="tns:DaneIdentyfikacyjne/tns:Nazwa">
-        <span class="label-data-info">
-          <span class="label-data-info--name">Nazwa: </span>
-          <span class="label-data-info--value"><xsl:value-of select="tns:DaneIdentyfikacyjne/tns:Nazwa"/></span>
-        </span>
-      </xsl:if>
+    </span>
+    <xsl:if test="tns:Udzial">
       <span class="label-data-info">
-        <span class="label-data-info--name">
-          <xsl:choose>
-            <xsl:when test="tns:RolaInna = '1'">
-              <xsl:text>Rola inna: </xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>Rola: </xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </span>
-        <span class="label-data-info--value">
-          <xsl:choose>
-            <xsl:when test="tns:Rola = '1'">
-              <xsl:text>Faktor</xsl:text>
-            </xsl:when>
-            <xsl:when test="tns:Rola = '2'">
-              <xsl:text>Odbiorca</xsl:text>
-            </xsl:when>
-            <xsl:when test="tns:Rola = '3'">
-              <xsl:text>Podmiot pierwotny</xsl:text>
-            </xsl:when>
-            <xsl:when test="tns:Rola = '4'">
-              <xsl:text>Dodatkowy nabywca</xsl:text>
-            </xsl:when>
-            <xsl:when test="tns:Rola = '5'">
-              <xsl:text>Wystawca faktury</xsl:text>
-            </xsl:when>
-            <xsl:when test="tns:Rola = '6'">
-              <xsl:text>Dokonujący płatności</xsl:text>
-            </xsl:when>
-            <xsl:when test="tns:Rola = '7'">
-              <xsl:text>Jednostka samorządu terytorialnego - wystawca</xsl:text>
-            </xsl:when>
-            <xsl:when test="tns:Rola = '8'">
-              <xsl:text>Jednostka samorządu terytorialnego - odbiorca</xsl:text>
-            </xsl:when>
-            <xsl:when test="tns:Rola = '9'">
-              <xsl:text>Członek grupy VAT - wystawca</xsl:text>
-            </xsl:when>
-            <xsl:when test="tns:Rola = '10'">
-              <xsl:text>Członek grupy VAT - odbiorca</xsl:text>
-            </xsl:when>
-            <xsl:when test="tns:RolaInna = '1'">
-              <xsl:value-of select="tns:OpisRoli"/>
-            </xsl:when>
-          </xsl:choose>
+        <span class="label-data-info--name">Udział: </span>
+        <span class="label-data-info--value"><xsl:value-of select="format-number(tns:Udzial, '##0,00####', 'european')"/><xsl:text>%</xsl:text></span>
+      </span>
+    </xsl:if>
+    <xsl:call-template name="Adres">
+      <xsl:with-param name="TypAdresu" select="'Adres'"/>
+    </xsl:call-template>
+    <xsl:call-template name="Adres">
+      <xsl:with-param name="TypAdresu" select="'AdresKoresp'"/>
+    </xsl:call-template>
+    <!-- Dane kontaktowe -->
+    <xsl:if test="tns:DaneKontaktowe">
+      <xsl:call-template name="DaneKontaktowe"/>
+    </xsl:if>
+    <xsl:if test="tns:NrKlienta">
+      <span class="label-data-info label-data-info--vertical-space">
+        <span class="label-data-info">
+          <span class="label-data-info--name">Numer klienta: </span>
+          <span class="label-data-info--value"><xsl:value-of select="tns:NrKlienta"/></span>
         </span>
       </span>
-      <xsl:if test="tns:Udzial">
-        <span class="label-data-info">
-          <span class="label-data-info--name">Udział: </span>
-          <span class="label-data-info--value"><xsl:value-of select="format-number(tns:Udzial, '##0,00####', 'european')"/><xsl:text>%</xsl:text></span>
-        </span>
-      </xsl:if>
-      <xsl:call-template name="Adres">
-        <xsl:with-param name="TypAdresu" select="'Adres'"/>
-      </xsl:call-template>
-      <xsl:call-template name="Adres">
-        <xsl:with-param name="TypAdresu" select="'AdresKoresp'"/>
-      </xsl:call-template>
-      <!-- Dane kontaktowe -->
-      <xsl:if test="tns:DaneKontaktowe">
-        <xsl:call-template name="DaneKontaktowe"/>
-      </xsl:if>
-      <xsl:if test="tns:NrKlienta">
-        <span class="label-data-info label-data-info--vertical-space">
-          <span class="label-data-info">
-            <span class="label-data-info--name">Numer klienta: </span>
-            <span class="label-data-info--value"><xsl:value-of select="tns:NrKlienta"/></span>
-          </span>
-        </span>
-      </xsl:if>
-    </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="NabywcaDodatkowyKorygowany">
-    <xsl:param name="IDNabywcy"/>
-    <xsl:for-each select="//tns:Podmiot2K[tns:IDNabywcy = $IDNabywcy]">
+    <xsl:param name="PodmiotKorygowany"/>
+    <xsl:for-each select="$PodmiotKorygowany">
       <xsl:if test="tns:IDNabywcy">
         <span class="label-data-info">
           <span class="label-data-info--name">Identyfikator nabywcy: </span>
