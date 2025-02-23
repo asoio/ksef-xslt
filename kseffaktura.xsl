@@ -962,9 +962,9 @@
             <xsl:for-each select="tns:Fa/tns:ZaliczkaCzesciowa">
               <tr>
                 <td class="table-basic__cell"><xsl:value-of select="tns:P_6Z"/></td>
-                <td class="table-basic__cell table-basic__cell--to-right"><xsl:value-of select="tns:P_15Z"/></td>
+                <td class="table-basic__cell table-basic__cell--to-right"><xsl:value-of select="format-number(tns:P_15Z, '### ##0,00', 'european')"/></td>
                 <xsl:if test="//tns:Fa/tns:ZaliczkaCzesciowa/tns:KursWalutyZW">
-                  <td class="table-basic__cell table-basic__cell--to-right"><xsl:value-of select="tns:KursWalutyZW"/></td>
+                  <td class="table-basic__cell table-basic__cell--to-right"><xsl:value-of select="format-number(tns:KursWalutyZW, '### ##0,00', 'european')"/></td>
                 </xsl:if>
               </tr>
             </xsl:for-each>
