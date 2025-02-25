@@ -945,6 +945,33 @@
         </span>
       </xsl:if>
     </div>
+    <!-- Zaliczki częściowe -->
+    <xsl:if test="tns:Fa/tns:ZaliczkaCzesciowa">
+      <div class="section-data">
+        <table class="table-basic table-basic--auto">
+          <thead>
+            <tr>
+              <th class="table-basic__header table-basic__header--medium-size">Data otrzymania płatności</th>
+              <th class="table-basic__header table-basic__header--medium-size">Kwota płatności</th>
+              <xsl:if test="tns:Fa/tns:ZaliczkaCzesciowa/tns:KursWalutyZW">
+                <th class="table-basic__header table-basic__header--medium-size">Kurs waluty</th>
+              </xsl:if>
+            </tr>
+          </thead>
+          <tbody>
+            <xsl:for-each select="tns:Fa/tns:ZaliczkaCzesciowa">
+              <tr>
+                <td class="table-basic__cell"><xsl:value-of select="tns:P_6Z"/></td>
+                <td class="table-basic__cell table-basic__cell--to-right"><xsl:value-of select="format-number(tns:P_15Z, '### ##0,00', 'european')"/></td>
+                <xsl:if test="//tns:Fa/tns:ZaliczkaCzesciowa/tns:KursWalutyZW">
+                  <td class="table-basic__cell table-basic__cell--to-right"><xsl:value-of select="format-number(tns:KursWalutyZW, '### ##0,00', 'european')"/></td>
+                </xsl:if>
+              </tr>
+            </xsl:for-each>
+          </tbody>
+        </table>
+      </div>
+    </xsl:if>
     <!-- Faktury zaliczkowe -->
     <xsl:if test="tns:Fa/tns:FakturaZaliczkowa">
       <div class="section-data">
